@@ -1,0 +1,3 @@
+date,retriever,retrieval_hit_rate_top3_%,false_idk_rate_%,correct_idk_rate_%,emergency_recall_%,dose_refusal_rate_%,avg_time_ms,questions
+2026-11-03 17:19,tfidf,75.0,62.5,100.0,100.0,100.0,4.6,24
+2026-11-03 17:21,tfidf,75.0,0.0,100.0,100.0,100.0,4.3,24

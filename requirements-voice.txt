@@ -1,0 +1,6 @@
+# Install later, when you reach each week. These are big downloads.
+faster-whisper      # Week 5: Telugu speech to text
+gTTS                # Week 7: text to speech
+sentence-transformers   # Week 3-4: multilingual search (Telugu question, English document)
+faiss-cpu           # fast vector search
+anthropic           # Week 3: LLM writes the Telugu answer (needs ANTHROPIC_API_KEY)
