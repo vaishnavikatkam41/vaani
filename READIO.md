@@ -4,14 +4,51 @@ This file is a **step-by-step setup script written in plain English**.
 It is meant to be read and followed by an AI coding assistant (or a person) on a fresh machine.
 Follow the steps **in order**. After each step, run its **Check** and do not continue until it passes.
 
-Last verified: 2026-11-13 on macOS 27 (Apple Silicon), Python 3.12.13. 61 tests passing.
+Last verified: 2026-11-14 on macOS 27 (Apple Silicon), Python 3.12.13. 62 tests passing, `tools/check_all.py` all green.
+
+---
+
+## Quick start: paste this into your AI coding assistant
+
+Open an AI coding assistant in an empty folder, then paste this whole block:
+
+```text
+Set up and run this project on my computer: https://github.com/vaishnavikatkam41/vaani
+
+1. Clone the repository, then open and read READIO.md completely before doing anything else.
+2. Before installing anything, ask me every question listed in READIO.md section
+   "Questions to ask the user first" (one short message, numbered). Wait for my answers.
+3. Then follow READIO.md step by step, in order. After every step run its "Check".
+   If a check fails, use the Troubleshooting table, and tell me what happened.
+4. Never write my API key into any file except the private .env file described in
+   READIO.md, never print it, never commit it.
+5. Finish with Step 10 (python -m tools.check_all) and show me the PASS/FAIL list,
+   the localhost link, and anything that still needs my action.
+```
+
+---
+
+## Questions to ask the user first
+
+An assistant following this file must ask these **before** Step 1 and wait for the answers:
+
+1. Which operating system is this: macOS, Windows or Linux? (Detect it, and just confirm.)
+2. Do you have a **Sarvam AI key**? (Free at https://dashboard.sarvam.ai. Without it, Telugu speech
+   recognition and Telugu answers are weaker.) If yes: will you paste it into the `.env` file yourself,
+   or do you want me to create `.env` and you paste the key into it?
+3. Where should the project folder go? (Default: the current folder.)
+4. Which branch? (Default: `main`.)
+5. Is there at least **12 GB free disk** and **8 GB RAM**? If not, use the light mode (`VAANI_RETRIEVER=tfidf`).
+6. Should I also run the full quality evaluation (Step 8, about 5 minutes)? (Default: yes.)
+7. Which port for the app? (Default: `8001`.)
+8. Are you going to change the code (then I explain the working rules in Section 13), or only run it?
 
 ---
 
 ## 0. Rules for whoever follows this file
 
-1. Do the steps in order. Each step has a **Check**. If a check fails, use [Troubleshooting](#11-troubleshooting) before moving on.
-2. **Never write an API key into any file**, never commit it, never print it in full. Keys live only in environment variables.
+1. Do the steps in order. Each step has a **Check**. If a check fails, use [Troubleshooting](#12-troubleshooting) before moving on.
+2. **API keys go only in the private `.env` file** (or the terminal environment). Never in any other file, never committed (`.env` is in `.gitignore`), never printed in full.
 3. **Never weaken the safety rules** in `src/safety.py` (emergency words, dose refusal, answer filter). Only add to them.
 4. Run commands from the project folder (`vaani/`) unless a step says otherwise.
 5. Use the virtual environment's Python (`.venv`) for every Python command after Step 3.
@@ -118,29 +155,29 @@ Expected: `packages OK`.
 
 ---
 
-## 4. Set the keys (environment variables only)
+## 4. Set the keys (private `.env` file)
 
-Ask the user for their **Sarvam AI key**. Then set it **for the current terminal only**:
+Create the private settings file from the template:
 
-**macOS / Linux:**
 ```bash
-export SARVAM_API_KEY="paste-key-here"
+cp .env.example .env          # Windows: copy .env.example .env
 ```
 
-**Windows (PowerShell):**
-```powershell
-$env:SARVAM_API_KEY="paste-key-here"
+Then the **user** opens `.env` in a text editor and pastes their key after `SARVAM_API_KEY=`:
 ```
+SARVAM_API_KEY=their-key-here
+```
+The server reads `.env` automatically on start. `.env` is in `.gitignore`, so it never reaches GitHub.
+(A key set in the terminal with `export SARVAM_API_KEY=...` also works and wins over the file.)
 
-To keep it across terminals on macOS/Linux, the user may add the `export` line to `~/.zshrc` or `~/.bashrc` **themselves**. Do not put it inside the project folder.
+Optional in `.env`: `VAANI_ADMIN_TOKEN=<long random text>` turns on `/admin/unanswered`.
 
-Optional: `VAANI_ADMIN_TOKEN` (any long random text) turns on the `/admin/unanswered` page.
+Without a Sarvam key, Vaani still works, with weaker Telugu: a local Telugu speech model, and English
+sentences taken straight from the guides (translated to Telugu).
 
-Without a Sarvam key, Vaani still works, with weaker Telugu: Whisper for speech, and English sentences taken straight from the guides (translated to Telugu).
-
-**Check:**
+**Check** (prints yes/no, never the key):
 ```bash
-python -c "import os; k=os.getenv('SARVAM_API_KEY'); print('Sarvam key set' if k else 'no key: running in basic mode')"
+python -c "import os; from src import config; print('Sarvam key found' if os.getenv('SARVAM_API_KEY') else 'no key: basic mode')"
 ```
 
 ---
@@ -183,11 +220,11 @@ They download automatically on first use, but doing it now makes the first start
 python -c "
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from faster_whisper import WhisperModel
+from src.asr import HFWhisper, DEFAULT_LOCAL_MODEL
 SentenceTransformer('intfloat/multilingual-e5-small'); print('1/4 search model OK')
 CrossEncoder('BAAI/bge-reranker-v2-m3'); print('2/4 reranker OK')
 n='facebook/nllb-200-distilled-600M'; AutoTokenizer.from_pretrained(n); AutoModelForSeq2SeqLM.from_pretrained(n); print('3/4 translator OK')
-WhisperModel('small', device='cpu', compute_type='int8'); print('4/4 speech model OK')
+HFWhisper(DEFAULT_LOCAL_MODEL); print('4/4 Telugu speech model OK')
 "
 ```
 
@@ -196,7 +233,7 @@ WhisperModel('small', device='cpu', compute_type='int8'); print('4/4 speech mode
 | `intfloat/multilingual-e5-small` | ~0.5 GB | finds candidate passages (meaning search) |
 | `BAAI/bge-reranker-v2-m3` | ~2.2 GB | checks which passage really answers; drives "I don't know" |
 | `facebook/nllb-200-distilled-600M` | ~2.5 GB | translates the Telugu question to English for searching |
-| `faster-whisper small` | ~0.5 GB | backup Telugu speech-to-text when there is no Sarvam key |
+| Telugu Whisper (see `DEFAULT_LOCAL_MODEL` in `src/asr.py`) | ~1 GB | Telugu speech-to-text when there is no Sarvam key |
 
 Models are saved in `~/.cache/huggingface/` (set `HF_HOME` to move them).
 
@@ -210,7 +247,7 @@ Models are saved in `~/.cache/huggingface/` (set `HF_HOME` to move them).
 python -m unittest discover -s tests -t . -v
 ```
 
-**Check:** the last lines say `Ran 61 tests` and `OK` (the count grows as tests are added; it must say `OK`).
+**Check:** the last lines say `Ran 62 tests` and `OK` (the count grows as tests are added; it must say `OK`).
 
 ---
 
@@ -250,7 +287,7 @@ Allow the microphone when Chrome asks. (The microphone only works on `localhost`
 
 **Check** (in a second terminal):
 ```bash
-curl -s http://127.0.0.1:8001/health
+curl -s http://127.0.0.1:8001/health      # shows which speech / answer / search engines are on
 curl -s http://127.0.0.1:8001/ask -H "content-type: application/json" -d '{"text":"What are the symptoms of dengue?"}'
 curl -s http://127.0.0.1:8001/ask -H "content-type: application/json" -d '{"text":"My father has chest pain"}'
 ```
@@ -260,15 +297,32 @@ To use another port, change `8001`. To stop the server: `Ctrl + C`.
 
 ---
 
-## 10. Environment variables (all optional except the key)
+## 10. Final check: test every feature
+
+With the server running, in a second terminal (virtual environment active):
+
+```bash
+python -m tools.check_all                 # or: --url http://127.0.0.1:<port>
+```
+
+It tests the pages, every picture tile, all safety rules (emergency, suicide crisis, dose
+refusal, off-topic), conversation memory, spoken answers, **voice upload with a recorded Telugu
+question**, the quality report, stats and admin lock.
+
+**Check:** the last line says `ALL CHECKS PASSED`. The `answer writer` line says whether Sarvam is on.
+Show the user the full list and the link **http://127.0.0.1:8001**.
+
+---
+
+## 11. Environment variables (all optional except the key)
 
 | Variable | Default | What it does |
 |---|---|---|
 | `SARVAM_API_KEY` | (none) | Sarvam speech-to-text + Telugu answer writing |
 | `SARVAM_LLM_MODEL` | `sarvam-105b` | which Sarvam model writes answers |
-| `SARVAM_MODEL` | (Sarvam default) | which Sarvam speech-to-text model |
 | `VAANI_RETRIEVER` | `rerank` | search type: `rerank` (best), `embedding`, `tfidf` (lightest) |
-| `VAANI_ASR_MODEL` | `small` | Whisper size for the no-key fallback |
+| `SARVAM_MODEL` | `saaras:v4` | Sarvam speech-to-text model |
+| `VAANI_ASR_MODEL` | see `src/asr.py` | local Telugu speech model (any Hugging Face Whisper id) |
 | `VAANI_NLLB_MODEL` | `facebook/nllb-200-distilled-600M` | question translator |
 | `VAANI_NO_NLLB` | (unset) | set to `1` to skip the translator (uses glossary only) |
 | `VAANI_ADMIN_TOKEN` | (unset) | enables `/admin/unanswered` (send as `X-Admin-Token` header) |
@@ -279,7 +333,7 @@ To use another port, change `8001`. To stop the server: `Ctrl + C`.
 
 ---
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 | Problem | Fix |
 |---|---|
@@ -290,6 +344,8 @@ To use another port, change `8001`. To stop the server: `Ctrl + C`.
 | `Address already in use` | Port 8001 is busy: use `--port 8002`, or stop the other server. |
 | First question is very slow | Normal: models load on first use (~35 s). Later questions take ~1–2 s. |
 | `Killed` / out of memory | Close other apps, or use `VAANI_RETRIEVER=tfidf`. |
+| **Voice is heard wrongly** | Open `http://127.0.0.1:8001/health`. If `speech` says `local:...`, the Sarvam key is missing: put it in `.env` and restart the server. Speak close to the phone, in a quiet place; tap "తప్పుగా విన్నాను? మళ్ళీ చెప్పండి" to say it again. |
+| Key in `.env` but `/health` still shows `local:` | Restart the server (it reads `.env` only at start). Check there are no spaces around `=` issues and the line starts with `SARVAM_API_KEY=`. |
 | Microphone does nothing | Use Chrome, open `http://127.0.0.1:8001` (not the computer's network IP), allow microphone permission. |
 | `ModuleNotFoundError` | The virtual environment is not active. Run `source .venv/bin/activate` (Windows: `.venv\Scripts\Activate.ps1`). |
 | `data/chunks.json not found` | Run Step 5. |
@@ -297,7 +353,7 @@ To use another port, change `8001`. To stop the server: `Ctrl + C`.
 
 ---
 
-## 12. Working on the code (after setup)
+## 13. Working on the code (after setup)
 
 ### Project map
 
@@ -315,6 +371,10 @@ data/sources.csv         the official source list (links, publisher, topic)
 data/glossary_te_en.csv  Telugu health words -> English (add rows to improve Telugu search)
 data/test_questions.csv  150 evaluation questions, with a dev/test split
 eval/run_eval.py         measures quality -> eval/results.md, results.json, log.csv
+tools/check_all.py       final check of a running server (every feature, PASS/FAIL)
+tools/asr_benchmark.py   compares Telugu speech-to-text engines (error rates)
+src/asr.py               speech-to-text: Sarvam saaras:v4 -> local Telugu Whisper
+.env.example             template for the private .env (keys)
 tools/tune_thresholds.py picks the "I don't know" cut-off on dev, reports on test
 tests/                   unit tests (run by GitHub on every push)
 ```

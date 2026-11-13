@@ -4,6 +4,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+
+def load_env_file(path=ROOT / ".env"):
+    """Read KEY=VALUE lines from a private .env file into the environment.
+
+    The .env file is listed in .gitignore, so keys never reach GitHub.
+    Values already set in the terminal win over the file."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip().removeprefix("export ").strip(), value.strip().strip('"').strip("'")
+        if key and value and key not in os.environ:
+            os.environ[key] = value
+
+
+if not os.environ.get("VAANI_SKIP_ENV_FILE"):   # tests set this so a real key is never used
+    load_env_file()
+
 # Where files live
 SOURCES_DIR = ROOT / "data" / "sources"          # put your WHO / government PDFs here
 SOURCES_CSV = ROOT / "data" / "sources.csv"      # data sheet: file, friendly name, link, date

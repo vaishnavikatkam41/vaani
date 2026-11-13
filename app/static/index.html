@@ -74,6 +74,8 @@ header { flex: none; padding: 14px 18px 10px; display: flex; align-items: center
 #thread { display: flex; flex-direction: column; gap: 16px; padding: 14px 0 20px; }
 .asked { align-self: flex-end; max-width: 88%; background: var(--sky); border: 3px solid var(--line); border-radius: 22px 22px 4px 22px; padding: 10px 16px; font-size: 19px; font-weight: 600; line-height: 1.4; display: flex; gap: 10px; align-items: center; }
 .asked .ic { font-size: 22px; }
+.redo { align-self: flex-end; margin-top: -8px; min-height: 44px; padding: 4px 14px; border-radius: 999px; border: 2px dashed var(--line); background: transparent; color: var(--ink); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.redo .ic { font-size: 18px; }
 .reply, .errcard { position: relative; background: var(--card); border: 3px solid var(--line); border-radius: 26px; box-shadow: 0 6px 0 var(--shade); padding: 20px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
 .reply::before, .errcard::before { content: ""; position: absolute; left: 18px; right: 18px; top: -3px; height: 8px; background: var(--border-band) repeat-x; background-size: 16px 8px; border-radius: 0 0 4px 4px; }
 .reply-text { margin: 0; font-size: 24px; font-weight: 500; line-height: 1.6; white-space: pre-line; }
@@ -570,7 +572,9 @@ dialog::backdrop { background: rgba(43, 26, 14, .6); }
   /* ---- recording with a kolam that follows the voice ---- */
   async function startRecording() {
     stopPlayback();
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    // Clean the voice in the browser: less fan / road noise, steady loudness, one channel.
+    const clean = { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 };
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: clean }); }
     catch (e) { showError("mic"); return; }
     const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
     recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
@@ -590,6 +594,7 @@ dialog::backdrop { background: rgba(43, 26, 14, .6); }
       audioCtx.createMediaStreamSource(stream).connect(analyser);
       const data = new Uint8Array(analyser.fftSize);
       let heard = false, quietSince = performance.now();
+      const startedAt = performance.now();
       const tick = () => {
         analyser.getByteTimeDomainData(data);
         let sum = 0; for (const v of data) { const x = (v - 128) / 128; sum += x * x; }
@@ -598,7 +603,8 @@ dialog::backdrop { background: rgba(43, 26, 14, .6); }
         $("wave").style.setProperty("--lvl", Math.min(rms * 6, 1).toFixed(2));
         const now = performance.now();
         if (rms > 0.03) { heard = true; quietSince = now; }
-        if (heard && now - quietSince > 2000) { stopRecording(); return; }   // stops by itself after 2 quiet seconds
+        // stops by itself after 2.5 quiet seconds (a short pause mid-question is fine)
+        if (heard && now - quietSince > 2500 && now - startedAt > 1500) { stopRecording(); return; }
         rafId = requestAnimationFrame(tick);
       };
       tick();
@@ -685,6 +691,12 @@ dialog::backdrop { background: rgba(43, 26, 14, .6); }
     if (question) {
       const asked = el("div", "asked"); if (fromVoice) asked.innerHTML = ico("mic");
       asked.append(document.createTextNode(question)); thread.appendChild(asked);
+      if (fromVoice) {   // speech-to-text can mishear: one tap to say it again
+        const redo = btn("redo", "mic", "తప్పుగా విన్నాను? మళ్ళీ చెప్పండి");
+        redo.setAttribute("aria-label", "తప్పుగా విన్నాను. మళ్ళీ చెప్పండి. Heard wrong? Say again");
+        redo.addEventListener("click", () => { redo.remove(); startMic(); });
+        thread.appendChild(redo);
+      }
     }
     const isEmergency = data.status === "emergency" || data.status === "crisis";
     const isIdk = data.status === "idk" || data.status === "refuse";

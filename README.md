@@ -25,7 +25,7 @@ Health apps need text. Phones can listen. Vaani is built for them:
 | Area | Status |
 |---|---|
 | One big mic, picture-icon topic tiles (fever, pregnancy, baby, injury) | Done |
-| Telugu speech to text (Sarvam AI, Whisper as backup) | Done |
+| Telugu speech to text (Sarvam `saaras:v4` + health key terms; local Telugu Whisper backup; "say again" button) | Done |
 | Grounded answers from 12 official WHO / Govt of India guides (RAG) | Done |
 | Telugu question → English search (NLLB + health glossary) + reranker | Done |
 | 150-question evaluation (English + Telugu), dev/test split, public metrics page | Done |
@@ -35,7 +35,7 @@ Health apps need text. Phones can listen. Vaani is built for them:
 | Thumbs up/down feedback, unanswered-question log (SQLite) | Done |
 | Night mode, installable web app (PWA), low-vision friendly sizes | Done |
 | "Warm & folk" design: kolam mic, 9 illustrated topic pictures, oil-lamp trust meter | Done |
-| 61 automated tests + GitHub CI | Done |
+| 62 automated tests + GitHub CI | Done |
 
 See the [Roadmap](#11-roadmap) for what is planned.
 
@@ -43,7 +43,7 @@ See the [Roadmap](#11-roadmap) for what is planned.
 
 ```mermaid
 flowchart TD
-    A[Villager speaks Telugu] --> B[Speech to text<br/>Sarvam AI, Whisper fallback]
+    A[Villager speaks Telugu] --> B[Speech to text<br/>Sarvam saaras:v4, Telugu Whisper fallback]
     B --> C{Emergency words?}
     C -- yes --> D[Go to hospital, call 108]
     C -- no --> E{Asks for a dose?}
@@ -93,11 +93,11 @@ These rules are enforced in code and covered by tests (`tests/test_safety.py`, `
 
 ## 5. Tech stack
 
-- **Deep Learning:** multilingual-e5-small embeddings (Telugu question to English passage), Whisper (faster-whisper) ASR fallback, Sarvam AI speech and language models.
+- **Deep Learning:** multilingual-e5-small embeddings (Telugu question to English passage), Telugu fine-tuned Whisper as the offline speech fallback (chosen by error-rate benchmark, `tools/asr_benchmark.py`), Sarvam AI speech and language models.
 - **Data Science:** PDF cleaning and chunking, vector search with FAISS, threshold tuning with probe questions, evaluation set with hit-rate metrics, k-means topic clustering (planned for the ASHA dashboard).
 - **Backend:** Python, FastAPI, SQLite.
 - **Frontend:** plain HTML, CSS and JavaScript (installable PWA). No framework. Hind Guntur + Ramabhadra fonts, "warm & folk" design (kolam, earthy indigo / terracotta / turmeric, red only for emergencies).
-- **Voice:** Sarvam speech-to-text (`te-IN`), gTTS for speech out.
+- **Voice:** Sarvam speech-to-text (`saaras:v4`, `te-IN`, health key terms), browser noise suppression, gTTS for speech out.
 
 ## 6. Run it on your laptop
 
@@ -123,11 +123,15 @@ $env:SARVAM_API_KEY="your_key_here"
 py -m uvicorn app.api:app --port 8001
 ```
 
-The first start downloads the models (~5 GB: embeddings, reranker, NLLB, Whisper) and takes about 35 s to load them.
+The first start downloads the models (~6 GB: embeddings, reranker, NLLB, Telugu Whisper) and takes about 35 s to load them.
 
 Open http://127.0.0.1:8001 in Chrome and allow the microphone.
 
-**Without a key** Vaani still works, but with weaker Telugu: Whisper for speech and extractive answers.
+**Without a key** Vaani still works, but with weaker Telugu: a local Telugu Whisper model for speech and extractive answers.
+
+**Easiest way to set the key:** `cp .env.example .env`, then paste the key after `SARVAM_API_KEY=` in `.env` (it is git-ignored). Check with http://127.0.0.1:8001/health.
+
+**Final check of everything:** with the server running, `python -m tools.check_all`.
 **Never put your key in a file or on GitHub.** Use the environment variable only.
 
 ### Build the knowledge base
@@ -167,7 +171,7 @@ Live page: `/metrics.html`. Full table: `eval/results.md`. Label corrections are
 ## 8. Test and measure
 
 ```powershell
-python -m unittest discover -s tests -t . -v      # 61 tests (also run by GitHub CI on every push)
+python -m unittest discover -s tests -t . -v      # 62 tests (also run by GitHub CI on every push)
 python -m eval.run_eval                           # 150 questions -> eval/results.md + results.json
 python -m tools.tune_thresholds --retriever rerank  # pick the "I don't know" cut-off on dev, report on test
 ```

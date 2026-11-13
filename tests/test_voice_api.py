@@ -63,7 +63,10 @@ class TestVoiceApi(unittest.TestCase):
         self.assertEqual(self.client.get("/icon-192.png").status_code, 200)
 
     def test_routes_not_hidden_by_page(self):
-        self.assertEqual(self.client.get("/health").json(), {"ok": True})
+        data = self.client.get("/health").json()
+        self.assertTrue(data["ok"])
+        self.assertIn("speech", data)
+        self.assertNotIn("key", str(data.values()).replace("SARVAM_API_KEY", ""))
 
     def test_voice_question_returns_answer_and_audio(self):
         response = self._post_voice("How should I care for the newborn umbilical cord?")

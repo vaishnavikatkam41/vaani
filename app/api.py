@@ -67,7 +67,11 @@ class EndRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"ok": True}
+    """Server check + which engines are on (never shows keys)."""
+    from src import asr, llm
+    return {"ok": True, "speech": asr.engine_name(),
+            "answers": "sarvam" if llm.available() else "extractive (no SARVAM_API_KEY)",
+            "search": config.DEFAULT_RETRIEVER}
 
 
 def make_audio(result):
