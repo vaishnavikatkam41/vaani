@@ -33,6 +33,11 @@ def pick_sentences(question, hits, max_sentences=3, max_words=45):
             if overlap:
                 candidates.append((overlap, order, sentence))
             order += 1
+    if not candidates and hits:
+        # No shared words (a Telugu question has no English words to match).
+        # Retrieval already found the best passage by MEANING, so use its first sentences.
+        first = [x for x in split_sentences(hits[0]["text"]) if 4 <= len(x.split()) <= max_words]
+        return " ".join(first[:max_sentences])
     best = sorted(candidates, key=lambda c: (-c[0], c[1]))[:max_sentences]
     return " ".join(s for _, _, s in sorted(best, key=lambda c: c[1]))
 

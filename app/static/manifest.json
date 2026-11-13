@@ -4,11 +4,21 @@
   "description": "Telugu voice health assistant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f0fdfa",
-  "theme_color": "#0f766e",
+  "background_color": "#F5B820",
+  "theme_color": "#F5B820",
   "lang": "te",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

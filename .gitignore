@@ -8,3 +8,5 @@ data/chunks.json
 data/unanswered_log.csv
 data/cache/
 data/vaani.db
+*.zip
+.env

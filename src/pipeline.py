@@ -79,13 +79,19 @@ class Vaani:
             return self._fixed("idk") | {"score": top_score, "trust": "idk"}
 
         # 6. Write the answer
-        language, body = "en", ""
+        language, body, llm_said_no = "en", "", False
         if llm.available():
             try:
                 body = llm.write_answer(query, hits) or ""
-                language = "te" if body else "en"
+                llm_said_no = not body          # the AI says the passages do not answer it
+                if body:
+                    language = "te" if translate.has_telugu(body) else "en"
             except Exception as error:  # network or key problem: fall back to the baseline
                 print("LLM error, using baseline:", error)
+        if llm_said_no:
+            if self.log_unanswered:
+                self._log_unanswered(text)
+            return self._fixed("idk") | {"score": top_score, "trust": "idk"}
         if not body:
             body = answer.pick_sentences(query, hits)
             language = "en"

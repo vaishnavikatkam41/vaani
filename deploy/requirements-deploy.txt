@@ -4,6 +4,7 @@ numpy
 sentence-transformers
 faiss-cpu
 faster-whisper
+av<18
 gTTS
 deep-translator
 scikit-learn
@@ -11,3 +12,4 @@ pypdf
 fastapi
 uvicorn
 python-multipart
+httpx

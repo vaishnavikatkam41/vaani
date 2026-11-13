@@ -9,7 +9,7 @@ Every answer names its sources. Chat memory lasts only for the current conversat
 ## Pipeline order
 emergency check -> dose check -> follow-up context -> retrieval -> "I don't know" check -> answer -> safety filter -> translate to Telugu -> Trust Meter + sources
 
-## Built and working (34 tests pass)
+## Built and working (45 tests pass)
 - RAG brain (src/): ingest, TF-IDF + multilingual-e5 retriever, safety, answer, pipeline, conversation
 - Voice: faster-whisper (ASR), gTTS (TTS), deep-translator (EN->TE)
 - FastAPI server (app/api.py): /ask /ask_voice /feedback /stats /admin/unanswered /end /audio /health
@@ -20,7 +20,8 @@ emergency check -> dose check -> follow-up context -> retrieval -> "I don't know
 ## Honest limits
 - 24 test questions is small. Need 140+.
 - Machine translation is a stop-gap. Whisper small is weak in Telugu.
-- Embedding thresholds (0.78, 0.85) are still guesses.
+- Embedding thresholds are now (0.79, 0.82), set from a 9-question probe. Redo with the big test set.
+- Sarvam Telugu answer quality is NOT yet measured. Test it on the 24-question set first.
 - No ASHA review, no real-voice WER test yet.
 - HF Space disk resets on restart, so the database resets too.
 

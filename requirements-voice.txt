@@ -1,5 +1,6 @@
 # Install for the voice app (big downloads).
 faster-whisper          # Telugu speech to text
+av<18                   # audio reader; newer versions break faster-whisper
 gTTS                    # text to speech
 deep-translator         # English answer -> Telugu (stop-gap until the LLM step)
 sentence-transformers   # meaning-based search (Telugu question, English document)

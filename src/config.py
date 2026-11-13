@@ -24,7 +24,7 @@ TOP_K = 3
 # These are STARTING GUESSES. Tune them with eval/run_eval.py.
 THRESHOLDS = {
     "tfidf": (0.12, 0.25),
-    "embedding": (0.78, 0.85),
+    "embedding": (0.79, 0.82),   # from a 9-question probe (Telugu on-topic 0.814-0.847); redo with the big test set
 }
 
 # Conversation memory (kept only in RAM, never saved to disk)
