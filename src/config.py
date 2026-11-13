@@ -31,3 +31,8 @@ THRESHOLDS = {
 SESSION_MAX_TURNS = 3
 SESSION_TTL_SECONDS = 30 * 60
 SHORT_QUESTION_WORDS = 6   # shorter questions are joined with the previous question
+
+# Database (SQLite: one file, built into Python, nothing to install).
+# It stores NO conversations, NO voices, NO names. Only: questions Vaani could not answer,
+# and thumbs up / thumbs down feedback. Override the path with the VAANI_DB variable.
+DB_FILE = ROOT / "data" / "vaani.db"

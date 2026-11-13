@@ -7,4 +7,4 @@ data/sources/*.pdf
 data/chunks.json
 data/unanswered_log.csv
 data/cache/
-data/cache/
+data/vaani.db

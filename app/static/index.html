@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eef7f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071a19" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Vaani: Telugu voice health assistant. Ask by voice, hear the answer.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Vaani - వాణి</title>
+<style>
+  :root {
+    --ground: #eef7f5;
+    --sheet: #ffffff;
+    --ink: #0c2b28;
+    --muted: #4d6f6a;
+    --line: #cfe5e0;
+    --brand: #0f766e;
+    --brand-deep: #0b5d57;
+    --rec: #e5484d;
+    --ok: #1f8a4c;
+    --warn: #a8620a;
+    --danger: #c42b2b;
+    --accent: var(--brand);
+    --mic: 176px;
+    --font: "Noto Sans Telugu", "Atkinson Hyperlegible", "Nirmala UI", system-ui, sans-serif;
+    --font-latin: "Atkinson Hyperlegible", "Noto Sans Telugu", system-ui, sans-serif;
+    color-scheme: light dark;
+  }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #071a19; --sheet: #0d2927; --ink: #e6f6f3; --muted: #8fb8b2; --line: #17403c;
+      --brand: #17a398; --brand-deep: #0f766e; --rec: #ff6b70; --ok: #46c47a; --warn: #f0a24a; --danger: #ff6b6b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #071a19; --sheet: #0d2927; --ink: #e6f6f3; --muted: #8fb8b2; --line: #17403c;
+    --brand: #17a398; --brand-deep: #0f766e; --rec: #ff6b70; --ok: #46c47a; --warn: #f0a24a; --danger: #ff6b6b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: var(--font); font-size: 18px; line-height: 1.55;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 8px; }
+  .en { font-family: var(--font-latin); color: var(--muted); }
+
+  /* ---------- layout ---------- */
+  .app {
+    width: 100%; max-width: 560px; margin: 0 auto; min-height: 100dvh;
+    display: flex; flex-direction: column;
+    padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  /* ---------- top bar ---------- */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0 8px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand img { width: 36px; height: 36px; border-radius: 10px; display: block; }
+  .brand b { font-size: 1.25rem; font-weight: 700; letter-spacing: .01em; }
+  .brand span { font-family: var(--font-latin); font-size: 1.05rem; color: var(--muted); }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  .sos {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px;
+    background: var(--danger); color: #fff; border-radius: 999px; text-decoration: none;
+    font-family: var(--font-latin); font-weight: 700; font-size: 1.1rem;
+  }
+  .sos svg { width: 20px; height: 20px; fill: currentColor; }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--line);
+    background: transparent; display: grid; place-items: center;
+  }
+  .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- scrolling area ---------- */
+  main { padding: 8px 0 8px; display: flex; flex-direction: column; }
+  .app.has-thread main { flex: 1; padding-bottom: 24px; }
+  .hello { padding: 10px 0 2px; text-align: center; }
+  .hello h1 { margin: 0; font-size: 1.8rem; line-height: 1.25; font-weight: 700; }
+  .hello p { margin: 6px 0 0; font-size: 1.05rem; }
+
+  /* topic list: one grouped list, not a grid of cards */
+  .topics { margin: 12px 0 0; padding: 0; list-style: none; background: var(--sheet);
+            border: 1.5px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .topics-wrap { padding: 8px 0 32px; }
+  .topics-title { margin: 8px 4px 0; font-size: 1.05rem; font-weight: 600; }
+  .topics-title .en { display: block; font-size: .9rem; font-weight: 400; }
+  .topics li + li { border-top: 1.5px solid var(--line); }
+  .topic { width: 100%; min-height: 64px; display: flex; align-items: center; gap: 14px; text-align: left;
+           padding: 10px 16px; border: 0; background: transparent; }
+  .topic:active { background: color-mix(in srgb, var(--brand) 10%, transparent); }
+  .topic .ico { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+                font-size: 1.5rem; background: color-mix(in srgb, var(--brand) 12%, var(--sheet)); }
+  .topic .txt { flex: 1; font-size: 1.2rem; font-weight: 600; line-height: 1.3; }
+  .topic .txt small { display: block; font-family: var(--font-latin); font-weight: 400; font-size: .9rem; color: var(--muted); }
+
+  /* conversation */
+  .thread { display: none; flex-direction: column; gap: 22px; padding-top: 10px; }
+  .app.has-thread .thread { display: flex; }
+  .app.has-thread .hello, .app.has-thread .topics-wrap { display: none; }
+
+  .asked { align-self: flex-end; max-width: 88%; text-align: right; font-size: 1.1rem; color: var(--muted); }
+  .asked svg { width: 16px; height: 16px; vertical-align: -2px; margin-right: 6px; fill: currentColor; }
+
+  .reply { border-left: 5px solid var(--tone, var(--brand)); padding: 2px 0 2px 16px; }
+  .reply[data-tone="sure"]   { --tone: var(--ok); }
+  .reply[data-tone="unsure"] { --tone: var(--warn); }
+  .reply[data-tone="idk"]    { --tone: var(--muted); }
+  .reply-text { margin: 0; font-size: 1.3rem; line-height: 1.7; }
+  .trust { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 1rem; }
+  .bars { display: inline-flex; gap: 4px; }
+  .bars i { width: 22px; height: 8px; border-radius: 4px; background: var(--line); }
+  .bars i.on { background: var(--tone, var(--brand)); }
+  .sources { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .sources li { font-family: var(--font-latin); font-size: .9rem; color: var(--muted);
+                border: 1.5px solid var(--line); border-radius: 999px; padding: 3px 12px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .act { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent;
+         display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; }
+  .act svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .act[aria-pressed="true"] { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, transparent); }
+  .act:disabled { opacity: .6; cursor: default; }
+  .thanks { align-self: center; font-size: 1rem; color: var(--muted); }
+
+  /* ---------- dock with the mic ---------- */
+  .dock { padding: 6px 0 max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 10px;
+          position: sticky; bottom: 0; background: linear-gradient(to top, var(--ground) 70%, transparent); }
+  .app.has-thread { --mic: 104px; }
+  .app:not(.has-thread) .dock { position: static; background: none; padding-top: 28px; padding-bottom: 12px; }
+
+  .mic-wrap { position: relative; width: var(--mic); height: var(--mic); transition: width .3s, height .3s; }
+  .mic-wrap::before, .mic-wrap::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    transform: scale(calc(1.14 + var(--lvl, 0) * .5)); transition: transform .08s linear;
+    pointer-events: none;
+  }
+  .mic-wrap::after { border-color: color-mix(in srgb, var(--accent) 22%, transparent); transform: scale(calc(1.3 + var(--lvl, 0) * .9)); }
+  .app[data-state="idle"] .mic-wrap::before { animation: breathe 3.6s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(1.1); opacity: 1; } 50% { transform: scale(1.2); opacity: .55; } }
+  .app[data-state="thinking"] .mic-wrap::before { border-style: dashed; animation: turn 2.2s linear infinite; transform: scale(1.14); }
+  @keyframes turn { to { transform: scale(1.14) rotate(360deg); } }
+
+  #mic {
+    position: absolute; inset: 0; border: 0; border-radius: 50%; color: #fff;
+    background: radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--accent) 72%, #fff), var(--accent) 58%, color-mix(in srgb, var(--accent) 78%, #000));
+    box-shadow: 0 18px 38px -14px color-mix(in srgb, var(--accent) 80%, #000), inset 0 1px 0 rgba(255,255,255,.28);
+    display: grid; place-items: center; transition: transform .12s, background .25s;
+  }
+  #mic:active { transform: scale(.96); }
+  #mic svg { width: 44%; height: 44%; fill: currentColor; }
+  .app[data-state="listening"] { --accent: var(--rec); }
+  .app[data-state="speaking"]  { --accent: var(--ok); }
+
+  .status { min-height: 32px; display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 600; text-align: center; }
+  .wave { display: none; align-items: center; gap: 3px; height: 20px; }
+  .wave i { width: 4px; height: 100%; border-radius: 2px; background: var(--accent); transform-origin: center; animation: eq 0.9s ease-in-out infinite; }
+  .wave i:nth-child(2) { animation-delay: .12s; } .wave i:nth-child(3) { animation-delay: .24s; }
+  .wave i:nth-child(4) { animation-delay: .36s; } .wave i:nth-child(5) { animation-delay: .48s; }
+  @keyframes eq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  .app[data-state="speaking"] .wave { display: inline-flex; }
+  .hint { margin: 0; font-size: .95rem; text-align: center; }
+  .app.has-thread .hint { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mic-wrap::before, .mic-wrap::after, .wave i { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- emergency screen ---------- */
+  .emergency { position: fixed; inset: 0; z-index: 20; background: var(--danger); color: #fff; display: none;
+               flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 28px; text-align: center; }
+  .emergency.show { display: flex; }
+  .emergency h2 { margin: 0; font-size: 2.6rem; line-height: 1.2; }
+  .emergency p { margin: 0; font-size: 1.5rem; line-height: 1.5; max-width: 22em; }
+  .emergency a { display: inline-flex; align-items: center; gap: 12px; min-height: 68px; padding: 0 32px; border-radius: 999px;
+                 background: #fff; color: var(--danger); font-family: var(--font-latin); font-weight: 700; font-size: 1.8rem; text-decoration: none; }
+  .emergency a svg { width: 28px; height: 28px; fill: currentColor; }
+  .emergency button { min-height: 52px; padding: 0 28px; border-radius: 999px; border: 2px solid #fff; background: transparent; color: #fff; font-size: 1.15rem; }
+
+  /* ---------- info sheet ---------- */
+  dialog { width: min(92vw, 520px); border: 0; border-radius: 20px; padding: 22px; background: var(--sheet); color: var(--ink); }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  dialog h2 { margin: 0 0 10px; font-size: 1.4rem; }
+  dialog p { margin: 0 0 12px; font-size: 1.05rem; line-height: 1.6; }
+  dialog .close { margin-top: 6px; min-height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: var(--brand); color: #fff; font-size: 1.1rem; }
+
+  @media (min-width: 700px) {
+    .app { border-left: 1.5px solid var(--line); border-right: 1.5px solid var(--line); background: color-mix(in srgb, var(--sheet) 35%, var(--ground)); }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app" data-state="idle">
+
+  <header class="top">
+    <div class="brand">
+      <img src="icon-192.png" alt="">
+      <div><b>వాణి</b> <span>Vaani</span></div>
+    </div>
+    <div class="top-actions">
+      <a class="sos" href="tel:108" aria-label="అత్యవసరం: 108 కు కాల్ చేయండి. Emergency: call 108.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+        108
+      </a>
+      <button class="icon-btn" id="info-btn" type="button" aria-label="వాణి గురించి. About Vaani.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="scroller">
+    <section class="hello">
+      <h1>నమస్కారం</h1>
+      <p>మీ ఆరోగ్య ప్రశ్న అడగండి</p>
+      <p class="en">Ask your health question</p>
+    </section>
+
+    <section class="thread" id="thread" aria-live="polite" aria-label="సంభాషణ"></section>
+  </main>
+
+  <footer class="dock">
+    <div class="mic-wrap" id="mic-wrap">
+      <button id="mic" type="button" aria-label="మాట్లాడటానికి నొక్కండి. Tap to speak.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+      </button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite">
+      <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <span id="status-text">మాట్లాడటానికి నొక్కండి</span>
+    </div>
+    <p class="hint en" id="hint">Tap the mic and speak</p>
+  </footer>
+
+  <section class="topics-wrap">
+    <p class="topics-title">ఈ విషయాల గురించి అడగవచ్చు <span class="en">Or tap a topic</span></p>
+    <ul class="topics" id="topics"></ul>
+  </section>
+</div>
+
+<section class="emergency" id="emergency" role="alertdialog" aria-labelledby="em-title">
+  <h2 id="em-title">అత్యవసరం!</h2>
+  <p id="em-text"></p>
+  <a href="tel:108">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+    Call 108
+  </a>
+  <button id="em-close" type="button">వెనక్కి వెళ్ళు</button>
+</section>
+
+<dialog id="info">
+  <h2>వాణి గురించి</h2>
+  <p>వాణి WHO మరియు భారత ప్రభుత్వ ఆరోగ్య పత్రాల నుండి మాత్రమే సమాధానాలు ఇస్తుంది. ఇది సాధారణ ఆరోగ్య అవగాహన కోసం మాత్రమే. మందుల మోతాదు లేదా రోగ నిర్ధారణ చెప్పదు. అత్యవసరంలో 108 కు కాల్ చేయండి.</p>
+  <p class="en">Vaani answers only from WHO and Government of India health documents. General awareness only: no diagnosis and no medicine doses. In an emergency, call 108.</p>
+  <p>మీ సంభాషణ సేవ్ కాదు. యాప్ మూసివేస్తే మర్చిపోతుంది. “ఉపయోగపడలేదు” నొక్కితే ఆ ప్రశ్న, సమాధానం పేరు లేకుండా భద్రపరుస్తాము, మెరుగుపరచడానికి.</p>
+  <p class="en">Your conversation is not saved. It is forgotten when you close the app. If you tap “Not helpful”, that question and answer are saved without your name, so we can fix them.</p>
+  <button class="close" id="info-close" type="button">సరే</button>
+</dialog>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const app = $("app"), mic = $("mic"), thread = $("thread"), scroller = $("scroller");
+
+  const T = {
+    idle: "మాట్లాడటానికి నొక్కండి",
+    listening: "వింటున్నాను… చెప్పండి",
+    thinking: "ఆలోచిస్తున్నాను…",
+    speaking: "చెబుతున్నాను…",
+    error: "ఏదో తప్పు జరిగింది. మళ్ళీ ప్రయత్నించండి.",
+    micDenied: "మైక్ అనుమతి ఇవ్వండి.",
+    noVoice: "మీ గొంతు వినిపించలేదు. మళ్ళీ చెప్పండి.",
+    listenAgain: "మళ్ళీ వినండి",
+    helpful: "ఉపయోగపడింది",
+    notHelpful: "ఉపయోగపడలేదు",
+    thanks: "ధన్యవాదాలు",
+    trustHigh: "నమ్మకం ఎక్కువ",
+    trustLow: "నమ్మకం తక్కువ. ఆశా కార్యకర్తను అడగండి",
+    trustNone: "ఈ సమాచారం నా దగ్గర లేదు",
+    source: "మూలం",
+  };
+
+  const TOPICS = [
+    ["🤒", "జ్వరం", "Fever", "జ్వరం వస్తే ఇంట్లో ఏం చేయాలి?"],
+    ["💧", "విరేచనాలు", "Diarrhoea", "పిల్లలకు విరేచనాలు అయితే ఏం చేయాలి?"],
+    ["🤰", "గర్భిణీ సంరక్షణ", "Pregnancy care", "గర్భిణీ స్త్రీలు ఏ జాగ్రత్తలు తీసుకోవాలి?"],
+    ["👶", "నవజాత శిశువు", "Newborn care", "నవజాత శిశువు బొడ్డు తాడు సంరక్షణ ఎలా చేయాలి?"],
+    ["🔥", "కాలిన గాయం", "Burns", "కాలిన గాయానికి ప్రథమ చికిత్స ఏమిటి?"],
+    ["❤️", "రక్తపోటు", "Blood pressure", "రక్తపోటు తగ్గించుకోవడానికి ఏం చేయాలి?"],
+  ];
+
+  let sessionId = null;                 // kept only in memory; gone when the page closes
+  let recorder = null, chunks = [], stream = null, current = null;
+  let audioCtx = null, rafId = 0, maxTimer = 0, player = null;
+
+  /* ---------- state ---------- */
+  function setState(state, text) {
+    app.dataset.state = state;
+    $("status-text").textContent = text || T[state];
+    if (state !== "listening") mic.parentElement.style.setProperty("--lvl", 0);
+  }
+
+  /* ---------- topic list ---------- */
+  const list = $("topics");
+  TOPICS.forEach(([icon, te, en, q]) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "topic";
+    const ico = Object.assign(document.createElement("span"), { className: "ico", textContent: icon });
+    const txt = document.createElement("span"); txt.className = "txt"; txt.textContent = te;
+    const small = document.createElement("small"); small.textContent = en; txt.appendChild(small);
+    b.append(ico, txt);
+    b.addEventListener("click", () => askText(q));
+    li.appendChild(b); list.appendChild(li);
+  });
+
+  /* ---------- recording with a halo that follows the voice ---------- */
+  async function startRecording() {
+    stopPlayback();
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e) { setState("idle", T.micDenied); return; }
+
+    const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"]
+      .find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
+    recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+    chunks = [];
+    recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    recorder.onstop = onStopped;
+    recorder.start();
+    setState("listening");
+    watchVoice();
+    maxTimer = setTimeout(stopRecording, 20000);   // never record more than 20 seconds
+  }
+
+  function watchVoice() {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      audioCtx.createMediaStreamSource(stream).connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
+      let heard = false, quietSince = performance.now();
+      const tick = () => {
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (const v of data) { const x = (v - 128) / 128; sum += x * x; }
+        const rms = Math.sqrt(sum / data.length);
+        mic.parentElement.style.setProperty("--lvl", Math.min(rms * 6, 1).toFixed(2));
+        const now = performance.now();
+        if (rms > 0.03) { heard = true; quietSince = now; }
+        // stop by itself after the person has spoken and then stayed quiet for 2 seconds
+        if (heard && now - quietSince > 2000) { stopRecording(); return; }
+        rafId = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) { /* the halo just will not move; recording still works */ }
+  }
+
+  function stopRecording() {
+    clearTimeout(maxTimer);
+    cancelAnimationFrame(rafId);
+    if (audioCtx) { audioCtx.close().catch(() => {}); audioCtx = null; }
+    if (recorder && recorder.state !== "inactive") recorder.stop();
+  }
+
+  async function onStopped() {
+    stream.getTracks().forEach((t) => t.stop());
+    const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+    if (blob.size < 1500) { setState("idle", T.noVoice); return; }
+    setState("thinking");
+    const ext = (recorder.mimeType || "").includes("mp4") ? "m4a" : "webm";
+    const form = new FormData();
+    form.append("audio", blob, "question." + ext);
+    try {
+      const url = "/ask_voice" + (sessionId ? "?session_id=" + encodeURIComponent(sessionId) : "");
+      const res = await fetch(url, { method: "POST", body: form });
+      if (!res.ok) throw new Error("server " + res.status);
+      const data = await res.json();
+      addTurn(data.transcript, data, true);
+    } catch (e) { console.error(e); setState("idle", T.error); }
+  }
+
+  /* ---------- typed topics ---------- */
+  async function askText(question) {
+    stopPlayback();
+    setState("thinking");
+    try {
+      const res = await fetch("/ask", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: question, session_id: sessionId, speak: true }),
+      });
+      if (!res.ok) throw new Error("server " + res.status);
+      addTurn(question, await res.json(), false);
+    } catch (e) { console.error(e); setState("idle", T.error); }
+  }
+
+  /* ---------- drawing one question and answer ---------- */
+  const svg = (inner) => `<svg viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+  const ICON = {
+    mic: svg('<path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>'),
+    speaker: svg('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'),
+    up: svg('<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17.8 20H7"/>'),
+    down: svg('<path d="M7 13V4H4v9zM7 13l4 8a2 2 0 0 0 2-2v-4h6a2 2 0 0 0 2-2.3l-1.2-6A2 2 0 0 0 17.8 4H7"/>'),
+  };
+
+  function actionButton(icon, label) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "act";
+    b.innerHTML = icon;
+    b.append(document.createTextNode(label));
+    return b;
+  }
+
+  function addTurn(question, data, fromVoice) {
+    sessionId = data.session_id;
+    app.classList.add("has-thread");
+
+    if (question) {
+      const asked = document.createElement("div");
+      asked.className = "asked";
+      if (fromVoice) asked.insertAdjacentHTML("afterbegin", ICON.mic);
+      asked.append(document.createTextNode(question));
+      thread.appendChild(asked);
+    }
+
+    const isEmergency = data.status === "emergency" || data.status === "crisis";
+    const tone = data.status === "idk" || data.status === "refuse" ? "idk"
+               : data.trust === "unsure" ? "unsure" : "sure";
+    const reply = document.createElement("article");
+    reply.className = "reply"; reply.dataset.tone = tone;
+
+    const text = document.createElement("p");
+    text.className = "reply-text"; text.textContent = data.answer || "";
+    reply.appendChild(text);
+
+    if (data.status === "ok") {
+      const trust = document.createElement("div"); trust.className = "trust";
+      const bars = document.createElement("span"); bars.className = "bars";
+      const level = tone === "sure" ? 3 : 2;
+      for (let i = 0; i < 3; i++) { const b = document.createElement("i"); if (i < level) b.className = "on"; bars.appendChild(b); }
+      trust.append(bars, document.createTextNode(tone === "sure" ? T.trustHigh : T.trustLow));
+      reply.appendChild(trust);
+    } else if (tone === "idk") {
+      const trust = document.createElement("div"); trust.className = "trust";
+      trust.textContent = T.trustNone; reply.appendChild(trust);
+    }
+
+    if (data.sources && data.sources.length) {
+      const ul = document.createElement("ul"); ul.className = "sources";
+      ul.setAttribute("aria-label", T.source);
+      data.sources.forEach((s) => { const li = document.createElement("li"); li.textContent = s.replace(", page ", " p."); ul.appendChild(li); });
+      reply.appendChild(ul);
+    }
+
+    const actions = document.createElement("div"); actions.className = "actions";
+    if (data.audio_url) {
+      const again = actionButton(ICON.speaker, T.listenAgain);
+      again.addEventListener("click", () => play(data.audio_url));
+      actions.appendChild(again);
+    }
+    if (data.status === "ok" || data.status === "idk") {
+      const up = actionButton(ICON.up, T.helpful), down = actionButton(ICON.down, T.notHelpful);
+      const send = (helpful, btn) => {
+        up.disabled = down.disabled = true; btn.setAttribute("aria-pressed", "true");
+        fetch("/feedback", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ helpful, status: data.status, trust: data.trust, score: data.score,
+                                 question: question || null, answer: data.answer || null, sources: data.sources || [] }) }).catch(() => {});
+        const t = document.createElement("div"); t.className = "thanks"; t.textContent = T.thanks; actions.after(t);
+      };
+      up.addEventListener("click", () => send(true, up));
+      down.addEventListener("click", () => send(false, down));
+      actions.append(up, down);
+    }
+    if (actions.children.length) reply.appendChild(actions);
+    thread.appendChild(reply);
+    reply.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    if (isEmergency) { $("em-text").textContent = data.answer || ""; $("emergency").classList.add("show"); }
+    if (data.audio_url) play(data.audio_url); else setState("idle");
+  }
+
+  /* ---------- playback ---------- */
+  function stopPlayback() { if (player) { player.pause(); player = null; } }
+  function play(url) {
+    stopPlayback();
+    player = new Audio(url);
+    setState("speaking");
+    player.onended = player.onerror = () => setState("idle");
+    player.play().catch(() => setState("idle"));   // phones may block auto-play; the Listen button works
+  }
+
+  /* ---------- controls ---------- */
+  mic.addEventListener("click", () => {
+    const s = app.dataset.state;
+    if (s === "listening") stopRecording();
+    else if (s === "idle" || s === "speaking") startRecording();
+  });
+  $("em-close").addEventListener("click", () => $("emergency").classList.remove("show"));
+  $("info-btn").addEventListener("click", () => $("info").showModal());
+  $("info-close").addEventListener("click", () => $("info").close());
+
+  // Closing the app = forget the conversation (privacy: no login, no saved chats)
+  window.addEventListener("pagehide", () => {
+    if (sessionId) navigator.sendBeacon("/end", new Blob([JSON.stringify({ session_id: sessionId })], { type: "application/json" }));
+  });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>

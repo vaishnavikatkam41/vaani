@@ -47,10 +47,23 @@ class TestPipeline(unittest.TestCase):
     def test_follow_up_uses_previous_question(self):
         sid = "test-session"
         self.vaani.ask("How should I care for the newborn umbilical cord?", session_id=sid)
-        # Alone, this short question has no topic. With the memory, it means "cord".
-        alone = self.vaani.ask("when to go to health centre")
-        self.assertEqual(alone["status"], "idk")
-        result = self.vaani.ask("when to go to hospital", session_id=sid)
+        # We watch which text is sent to the search. This does not depend on the
+        # "I don't know" limit, so the test stays correct when you tune that limit.
+        seen = []
+        original = self.vaani.retriever.search
+
+        def spy(query, k=3):
+            seen.append(query)
+            return original(query, k=k)
+
+        self.vaani.retriever.search = spy
+        try:
+            result = self.vaani.ask("when to go to hospital", session_id=sid)
+            self.vaani.ask("when to go to hospital")          # no session: no memory
+        finally:
+            del self.vaani.retriever.search                    # put the real search back
+        self.assertIn("umbilical cord", seen[0])               # memory joined the old question
+        self.assertEqual(seen[1], "when to go to hospital")    # without memory: unchanged
         self.assertEqual(result["status"], "ok")
         self.vaani.end(sid)
         self.assertEqual(self.vaani.sessions.previous_question(sid), "")

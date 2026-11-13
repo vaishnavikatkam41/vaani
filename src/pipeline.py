@@ -9,12 +9,9 @@
  7. Safety filter         (remove dose / diagnosis sentences)
  8. Trust Meter + sources
 """
-import csv
 import json
-import time
-from pathlib import Path
 
-from . import answer, config, llm, safety
+from . import answer, config, db, llm, safety, translate
 from .conversation import SessionStore
 from .retrieval import get_retriever
 
@@ -45,14 +42,8 @@ class Vaani:
         return self._result(status, msg["en"], msg["te"], language="te")
 
     def _log_unanswered(self, question):
-        """Save the question only (no name, no phone, no id) so we know what sources to add."""
-        path = Path(config.UNANSWERED_LOG)
-        new_file = not path.exists()
-        with open(path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            if new_file:
-                writer.writerow(["time", "question"])
-            writer.writerow([time.strftime("%Y-%m-%d %H:%M"), question])
+        """Save the question text only (no name, no phone, no id) so we know what sources to add."""
+        db.log_unanswered(question)
 
     # ----- main -----
     def ask(self, text, session_id=None):
@@ -107,6 +98,12 @@ class Vaani:
             if status == "idk" and self.log_unanswered:
                 self._log_unanswered(text)
             return self._fixed(status) | {"score": top_score, "trust": trust}
+
+        # 7b. Telugu question + English answer -> translate for the Telugu user
+        if language == "en" and translate.has_telugu(text):
+            telugu = translate.to_telugu(body)
+            if telugu:
+                body, language = telugu, "te"
 
         # 8. Trust Meter prefix + sources
         body = answer.TRUST_PREFIX[trust][language] + body
