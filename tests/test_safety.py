@@ -18,6 +18,12 @@ class TestEmergency(unittest.TestCase):
     def test_crisis(self):
         self.assertEqual(safety.check_emergency("I want to die"), "crisis")
 
+    def test_reduced_fetal_movement(self):
+        # Found by the 150-question eval: "baby not moving" missed this wording.
+        for text in ["The baby is not moving inside my womb", "my baby has stopped moving",
+                     "కడుపులో బిడ్డ కదలడం లేదు"]:
+            self.assertEqual(safety.check_emergency(text), "emergency", text)
+
     def test_no_false_alarm_on_benefits(self):
         # 'fits' must not match inside 'benefits'
         self.assertIsNone(safety.check_emergency("what are the benefits of breastfeeding"))
@@ -31,8 +37,15 @@ class TestDose(unittest.TestCase):
         for text in ["what is the dose of paracetamol", "how many tablets for fever", "మందు మోతాదు ఎంత"]:
             self.assertTrue(safety.is_dose_request(text), text)
 
+    def test_insulin_and_units(self):
+        # Found by the 150-question eval.
+        for text in ["How much insulin should I take?", "how many units of insulin"]:
+            self.assertTrue(safety.is_dose_request(text), text)
+
     def test_normal_not_dose(self):
         self.assertFalse(safety.is_dose_request("how to care for a newborn"))
+        # Water / ORS amounts are home care, not medicine doses.
+        self.assertFalse(safety.is_dose_request("How much water should a child drink?"))
 
 
 class TestAnswerFilter(unittest.TestCase):

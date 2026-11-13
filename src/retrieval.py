@@ -77,7 +77,62 @@ class EmbeddingRetriever:
                 for s, i in zip(scores[0], ids[0]) if i != -1]
 
 
+class RerankRetriever:
+    """Best search (default). Three steps:
+
+    1. Telugu question -> English search text (NLLB + health glossary, query_translate.py).
+    2. Embedding search with BOTH the original and the English text; keep the
+       best `candidates` passages from the union (cheap, finds possible matches).
+    3. A cross-encoder (bge-reranker-v2-m3) reads question + passage TOGETHER and
+       scores how well the passage answers it (slower, much more accurate).
+
+    Why step 3? With embeddings alone, off-topic questions ("how do I learn English?")
+    scored 0.84 and real Telugu health questions 0.80 - no safe cut-off existed.
+    Reranker scores put off-topic near 0.00 and real questions far above, so the
+    "I don't know" gate has a wide safety margin. Score = reranker score (0..1).
+    """
+    kind = "rerank"
+
+    def __init__(self, chunks, candidates=10, model_name="BAAI/bge-reranker-v2-m3",
+                 embedder=None):
+        from sentence_transformers import CrossEncoder
+
+        self.chunks = chunks
+        self.candidates = candidates
+        self.embedder = embedder or EmbeddingRetriever(chunks)
+        self.reranker = CrossEncoder(model_name, max_length=256)
+        self._cache = {}
+
+    def search(self, query, k=3):
+        if query in self._cache:
+            return self._cache[query][:k]
+        from .query_translate import to_english
+
+        english = to_english(query)
+        pool = {}
+        for text in filter(None, (query, english)):
+            for hit in self.embedder.search(text, k=self.candidates):
+                key = hit.get("id", hit["text"])
+                if key not in pool or hit["score"] > pool[key]["embed_score"]:
+                    pool[key] = dict(hit, embed_score=hit["score"])
+        if not pool:
+            return []
+        hits = list(pool.values())
+        rerank_text = english or query
+        scores = self.reranker.predict([(rerank_text, h["text"]) for h in hits])
+        for hit, score in zip(hits, scores):
+            hit["score"] = float(score)
+            hit["search_text"] = rerank_text
+        hits.sort(key=lambda h: -h["score"])
+        if len(self._cache) > 512:
+            self._cache.clear()
+        self._cache[query] = hits
+        return hits[:k]
+
+
 def get_retriever(kind, chunks):
+    if kind == "rerank":
+        return RerankRetriever(chunks)
     if kind == "embedding":
         return EmbeddingRetriever(chunks)
     return TfidfRetriever(chunks)

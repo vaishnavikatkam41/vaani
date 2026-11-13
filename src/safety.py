@@ -19,7 +19,8 @@ EMERGENCY_WORDS = [
     "bleeding a lot", "bleeding will not stop", "bleeding won't stop", "fits",
     "seizure", "convulsion", "snake", "snake bite", "snakebite", "bitten by a snake",
     "unconscious", "not waking up", "fainted", "poison", "poisoning", "swallowed pesticide",
-    "drank pesticide", "baby not moving", "high fever with stiff neck",
+    "drank pesticide", "baby not moving", "baby is not moving", "baby stopped moving",
+    "baby has stopped moving", "baby not kicking", "high fever with stiff neck",
     # Telugu (Telugu script)
     "ఛాతీ నొప్పి", "ఛాతిలో నొప్పి", "గుండె నొప్పి", "గుండెపోటు",
     "ఊపిరి ఆడ", "ఊపిరాడ", "శ్వాస తీసుకోలేక", "శ్వాస ఆడ",
@@ -28,6 +29,7 @@ EMERGENCY_WORDS = [
     "పాము కాటు", "పాము కరిచ", "పాము కరి",
     "స్పృహ తప్ప", "స్పృహ లేదు", "కళ్లు తిరిగి పడ", "కళ్ళు తిరిగి పడ", "లేవడం లేదు",
     "విషం తాగ", "పురుగుల మందు తాగ", "పురుగు మందు తాగ",
+    "బిడ్డ కదలడం లేదు", "బిడ్డ కదలట్లేదు", "కడుపులో బిడ్డ కదల",
 ]
 
 # Mental-health crisis words. Different answer: call Tele-MANAS 14416 or 108.
@@ -39,6 +41,7 @@ CRISIS_WORDS = [
 # ---------- 2. Dose requests ----------
 DOSE_REQUEST_PATTERNS = [
     r"\bdose\b", r"\bdosage\b", r"\bhow (many|much) (tablets?|pills?|mg|ml|drops?)\b",
+    r"\bhow (many|much) (insulin|units?|medicines?|syrup|paracetamol|antibiotics?)\b",
     r"\bhow many times a day\b", r"\bwhich (tablet|medicine|medication|antibiotic)\b",
     r"మోతాదు", r"ఏ మాత్ర", r"ఎన్ని మాత్రలు", r"ఏ మందు",
 ]

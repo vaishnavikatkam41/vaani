@@ -1,8 +1,6 @@
 """Step 4: an AI model writes a short answer from the found passages ONLY.
 
-Two providers (the first one that has a key is used):
-  1. Sarvam AI   -> set SARVAM_API_KEY   (made for Indian languages, free credit at signup)
-  2. Anthropic   -> set ANTHROPIC_API_KEY (optional)
+Provider: Sarvam AI -> set SARVAM_API_KEY (made for Indian languages, free credit at signup).
 With no key, Vaani uses the simple extractive answer. That is our BASELINE.
 
 The AI never sees anything except the question and the passages.
@@ -29,8 +27,6 @@ SARVAM_URL = "https://api.sarvam.ai/v1/chat/completions"
 def provider():
     if os.getenv("SARVAM_API_KEY"):
         return "sarvam"
-    if os.getenv("ANTHROPIC_API_KEY"):
-        return "anthropic"
     return None
 
 
@@ -63,28 +59,12 @@ def _sarvam(question, passages):
     return (reply.json()["choices"][0]["message"]["content"] or "").strip()
 
 
-def _anthropic(question, passages):
-    import anthropic  # imported here so the project runs without this library
-    client = anthropic.Anthropic()
-    reply = client.messages.create(
-        model=os.getenv("VAANI_LLM_MODEL", "claude-haiku-5-5"),
-        max_tokens=400,
-        temperature=0,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user",
-                   "content": f"Passages:\n{_context(passages)}\n\nQuestion: {question}"}],
-    )
-    return reply.content[0].text.strip()
-
-
 def write_answer(question, passages):
     """Return the answer text, or None if the model says NO_ANSWER.
     Raises an error if the provider fails (the caller falls back to the baseline)."""
     which = provider()
     if which == "sarvam":
         text = _sarvam(question, passages)
-    elif which == "anthropic":
-        text = _anthropic(question, passages)
     else:
         raise RuntimeError("no LLM key set")
     if not text or "NO_ANSWER" in text:

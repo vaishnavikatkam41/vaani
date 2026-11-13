@@ -1,4 +1,5 @@
 """Settings for Vaani. All paths and numbers live here, so they are easy to change."""
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,13 +19,19 @@ MIN_CHUNK_WORDS = 20
 
 # Retrieval: how many passages to look at
 TOP_K = 3
+# Which search the app and eval use. Override with the VAANI_RETRIEVER variable.
+DEFAULT_RETRIEVER = os.getenv("VAANI_RETRIEVER", "rerank")
 
 # Trust thresholds per retriever: (below first = "I don't know",
 # below second = "not fully sure", above second = "sure").
 # These are STARTING GUESSES. Tune them with eval/run_eval.py.
 THRESHOLDS = {
     "tfidf": (0.12, 0.25),
-    "embedding": (0.79, 0.82),   # from a 9-question probe (Telugu on-topic 0.814-0.847); redo with the big test set
+    "embedding": (0.79, 0.82),   # dev-tuned 0.789; only 84.2% right on the test split - off-topic leaks through
+    # Reranker scores are 0..1 probabilities. Cut-off 0.086 chosen on the dev split by
+    # tools/tune_thresholds.py -> 98.2% right on the unseen test split (2026-11-13).
+    # 0.5 = the reranker thinks it is more likely than not that the passage answers.
+    "rerank": (0.086, 0.5),
 }
 
 # Conversation memory (kept only in RAM, never saved to disk)

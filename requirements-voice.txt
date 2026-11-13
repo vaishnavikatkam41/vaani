@@ -3,7 +3,8 @@ faster-whisper          # Telugu speech to text
 av<18                   # audio reader; newer versions break faster-whisper
 gTTS                    # text to speech
 deep-translator         # English answer -> Telugu (stop-gap until the LLM step)
-sentence-transformers   # meaning-based search (Telugu question, English document)
+sentence-transformers   # meaning-based search + reranker (bge-reranker-v2-m3)
+transformers            # NLLB: Telugu question -> English search text
+sentencepiece           # NLLB tokenizer
 faiss-cpu               # fast vector search
 httpx                   # lets the app tests run
-anthropic               # optional: LLM writes the Telugu answer (needs ANTHROPIC_API_KEY)

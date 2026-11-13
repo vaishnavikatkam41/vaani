@@ -10,3 +10,5 @@ data/cache/
 data/vaani.db
 *.zip
 .env
+.venv/
+data/sources/*.part

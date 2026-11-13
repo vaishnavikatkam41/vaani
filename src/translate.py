@@ -9,6 +9,7 @@ HONEST WARNING: machine translation can change the meaning of health advice.
 This is a stop-gap. Later, an LLM (src/llm.py) writes the Telugu answer directly
 from the passages, and a Telugu speaker or ASHA worker must review the answers.
 """
+import os
 import re
 
 TELUGU_CHARS = re.compile(r"[ఀ-౿]")
@@ -20,6 +21,8 @@ def has_telugu(text):
 
 def to_telugu(text):
     """Return the Telugu text, or None if translation fails (then we keep English)."""
+    if os.environ.get("VAANI_NO_TRANSLATE"):   # set by eval: scores do not depend on it
+        return None
     try:
         from deep_translator import GoogleTranslator
         out = GoogleTranslator(source="en", target="te").translate(text[:4500])

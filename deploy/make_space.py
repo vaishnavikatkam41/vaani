@@ -33,8 +33,13 @@ def main():
     copy_code("app")
     (OUT / "data" / "cache").mkdir(parents=True)
     shutil.copy2(chunks, OUT / "data" / "chunks.json")
-    if (ROOT / "data" / "sources.csv").exists():
-        shutil.copy2(ROOT / "data" / "sources.csv", OUT / "data" / "sources.csv")
+    for name in ("sources.csv", "glossary_te_en.csv"):
+        if (ROOT / "data" / name).exists():
+            shutil.copy2(ROOT / "data" / name, OUT / "data" / name)
+    (OUT / "eval").mkdir()
+    for name in ("results.json", "log.csv", "gate_results.json"):   # numbers for /metrics.html
+        if (ROOT / "eval" / name).exists():
+            shutil.copy2(ROOT / "eval" / name, OUT / "eval" / name)
     for file in embeddings:
         shutil.copy2(file, OUT / "data" / "cache" / file.name)
 

@@ -1,11 +1,13 @@
-file,friendly_name,url,date_accessed,license_note
-who_diarrhoea.pdf,WHO diarrhoea guide,,2026-10-27,WHO document - check reuse terms
-iphs_phc.pdf,Government health centre guide (IPHS),,2026-10-27,Govt of India - check terms
-hypertension_stg.pdf,Government blood pressure guide,,2026-10-27,Govt of India - check terms
-infection_control.pdf,Government infection control guide,,2026-10-27,Govt of India - check terms
-water_quality_sop.pdf,Government clean water guide,,2026-10-27,Govt of India - check terms
-chikungunya_guidelines.pdf,Government fever (chikungunya) guide,,2026-10-27,Govt of India - check terms
-high_risk_pregnancy.pdf,Government pregnancy care guide,,2026-10-27,Govt of India - check terms
-icmr_type1_diabetes.pdf,ICMR diabetes guide,,2026-10-27,ICMR - check terms
-who_maternal_mortality.pdf,WHO pregnancy care fact sheet,,2026-10-27,WHO fact sheet - check terms
-who_newborn_mortality.pdf,WHO newborn care fact sheet,,2026-10-27,WHO fact sheet - check terms
+file,friendly_name,topic,publisher,url,date_accessed,license_note
+asha_induction.pdf,Government ASHA guide (basic health),general;pregnancy;newborn;diarrhoea;hygiene;fever,NHM MoHFW,https://nhm.gov.in/images/pdf/communitisation/asha/ASHA_Induction_Module_English.pdf,2026-11-13,Govt of India public document
+asha_module7.pdf,Government ASHA guide (child health and nutrition),newborn;child;diarrhoea;nutrition;immunisation,NHSRC MoHFW,https://nhsrcindia.org/sites/default/files/2021-06/Skills%20That%20Save%20Lives%20ASHA%20Module-7%20English.pdf,2026-11-13,Govt of India public document
+asha_ncd.pdf,Government ASHA guide (BP and diabetes),hypertension;diabetes;cancer,NHM MoHFW,https://aam.mohfw.gov.in/download/document/263f3ca26df87dc44b7687c1b9cf0c15.pdf,2026-11-13,Govt of India public document
+hypertension_stg.pdf,Government blood pressure guide,hypertension,MoHFW,https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/6591.pdf,2026-11-13,Govt of India public document
+dengue_2023.pdf,Government dengue guide (2023),dengue;fever,NCVBDC MoHFW,https://ncvbdc.mohfw.gov.in/Doc/National%20Guidelines%20for%20Clinical%20Management%20of%20Dengue%20Fever%202023.pdf,2026-11-13,Govt of India public document
+malaria_asha_2025.pdf,Government malaria guide for ASHA (2025),malaria;fever,NCVBDC MoHFW,https://ncvbdc.mohfw.gov.in/Doc/Malaria-Training-Module-ASHA-2025.pdf,2026-11-13,Govt of India public document
+heat_cooling.pdf,Government heatstroke guide (2024),heatstroke,NCDC NPCCHH MoHFW,https://heathealth.info/wp-content/uploads/Emergency-Cooling-for-Severe-Heat-Related-Illnesses_March2024_NPCCHH.pdf,2026-11-13,Govt of India public document (mirror)
+snakebite_stg.pdf,Government snake bite guide,snakebite,NCDC MoHFW,https://ncdc.mohfw.gov.in/uploads/pdf/Standard-Treatment-Guidelines-for-Management-of-Snake-Bite.pdf,2026-11-13,Govt of India public document
+rabies_guidelines.pdf,Government dog bite and rabies guide,rabies;dog bite,NRCP MoHFW,https://rabiesfreeindia.mohfw.gov.in/resources/uploads/PageContentPdf/170687215557.pdf,2026-11-13,Govt of India public document
+elderly_asha.pdf,Government elderly care guide for ASHA,elderly,NHSRC MoHFW,https://nhsrcindia.org/sites/default/files/2021-11/Elderly%20Care%20Training%20Manual%20for%20ASHA.pdf,2026-11-13,Govt of India public document
+mental_health_day.pdf,Government mental health note,mental health,NHM MoHFW,https://nhm.gov.in/pdf/2024/World_Mental_Health_Day.pdf,2026-11-13,Govt of India public document
+telemanas_overview.pdf,Tele-MANAS helpline guide (14416),mental health;helpline,LGBRIMH MoHFW,https://mail.lgbrimh.gov.in/resources/TeleMANAS/Tele-MANAS_Overview.pdf,2026-11-13,Govt of India public document

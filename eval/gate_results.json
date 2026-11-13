@@ -1,0 +1,32 @@
+{
+ "embedding": {
+  "cutoff": 0.7887,
+  "date": "2026-11-13",
+  "dev_accuracy_%": 84.7,
+  "test_accuracy_%": 84.2,
+  "test_offtopic_answered": 8,
+  "test_offtopic_total": 11,
+  "test_mistakes": [
+   "said IDK to a real question: కుక్క కాటు గాయాన్ని ఎలా కడగాలి?",
+   "answered off-topic: How do I invest money in mutual funds?",
+   "answered off-topic: What is the price of gold today?",
+   "answered off-topic: Will it rain tomorrow in Guntur?",
+   "answered off-topic: How do I kill pests on my cotton crop?",
+   "answered off-topic: How do I learn English quickly?",
+   "answered off-topic: రేపు వర్షం పడుతుందా?",
+   "answered off-topic: రేషన్ కార్డు ఎలా తీసుకోవాలి?",
+   "answered off-topic: బిర్యానీ ఎలా వండాలి?"
+  ]
+ },
+ "rerank": {
+  "cutoff": 0.0862,
+  "date": "2026-11-13",
+  "dev_accuracy_%": 96.6,
+  "test_accuracy_%": 98.2,
+  "test_offtopic_answered": 0,
+  "test_offtopic_total": 11,
+  "test_mistakes": [
+   "said IDK to a real question: బొడ్డు తాడును ఎలా శుభ్రంగా ఉంచాలి?"
+  ]
+ }
+}

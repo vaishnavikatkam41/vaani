@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from src import db
+from src import config, db
 from src.pipeline import Vaani
 
 app = FastAPI(title="Vaani API", version="0.3")
@@ -29,15 +29,19 @@ _vaani = None
 
 def get_vaani():
     """Load the brain once, on first use.
-    Telugu questions need the meaning-based search, so 'embedding' is the default."""
+    Best search first (rerank); if its models cannot load, fall back step by step."""
     global _vaani
     if _vaani is None:
-        kind = os.getenv("VAANI_RETRIEVER", "embedding")
-        try:
-            _vaani = Vaani(retriever_kind=kind)
-        except ImportError:
-            print("Embedding libraries missing. Using the simple word search instead.")
-            _vaani = Vaani(retriever_kind="tfidf")
+        order = [config.DEFAULT_RETRIEVER] + [k for k in ("rerank", "embedding", "tfidf")
+                                              if k != config.DEFAULT_RETRIEVER]
+        for kind in order:
+            try:
+                _vaani = Vaani(retriever_kind=kind)
+                break
+            except (ImportError, OSError) as error:   # library missing / model download failed
+                if kind == "tfidf":
+                    raise
+                print(f"Search '{kind}' unavailable ({error}). Trying the next one.")
     return _vaani
 
 
@@ -98,6 +102,26 @@ def feedback(req: FeedbackRequest):
 def stats():
     """Counts only. No question text."""
     return db.stats()
+
+
+@app.get("/metrics/data")
+def metrics_data():
+    """Latest evaluation (eval/results.json) + score history (eval/log.csv) for metrics.html.
+    Public on purpose: it holds test-set numbers only, never user data."""
+    import csv
+    import json
+    results = config.EVAL_DIR / "results.json"
+    if not results.exists():
+        raise HTTPException(404, "No evaluation yet. Run: python -m eval.run_eval")
+    data = json.loads(results.read_text(encoding="utf-8"))
+    gates = config.EVAL_DIR / "gate_results.json"
+    if gates.exists():
+        data["gates"] = json.loads(gates.read_text(encoding="utf-8"))
+    log = config.EVAL_DIR / "log.csv"
+    if log.exists():
+        with open(log, newline="", encoding="utf-8") as f:
+            data["history"] = list(csv.DictReader(f))
+    return data
 
 
 @app.get("/admin/unanswered")

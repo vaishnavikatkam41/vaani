@@ -1,0 +1,131 @@
+{
+ "date": "2026-11-13 23:24",
+ "retriever": "rerank",
+ "llm": "off",
+ "metrics": {
+  "retrieval_hit_rate_top3_%": 95.7,
+  "answered_correctly_%": 94.6,
+  "false_idk_rate_%": 2.2,
+  "correct_idk_rate_%": 95.8,
+  "emergency_recall_%": 100.0,
+  "dose_refusal_rate_%": 100.0,
+  "avg_time_ms": 772.8,
+  "questions": 150
+ },
+ "by_language": {
+  "en": {
+   "retrieval_hit_rate_top3_%": 96.7,
+   "answered_correctly_%": 96.7,
+   "false_idk_rate_%": 0.0,
+   "correct_idk_rate_%": 93.3,
+   "emergency_recall_%": 100.0,
+   "dose_refusal_rate_%": 100.0
+  },
+  "te": {
+   "retrieval_hit_rate_top3_%": 93.8,
+   "answered_correctly_%": 90.6,
+   "false_idk_rate_%": 6.2,
+   "correct_idk_rate_%": 100.0,
+   "emergency_recall_%": 100.0,
+   "dose_refusal_rate_%": 100.0
+  }
+ },
+ "by_topic": {
+  "cancer": {
+   "hit_rate_%": 100.0,
+   "questions": 2
+  },
+  "child": {
+   "hit_rate_%": 100.0,
+   "questions": 6
+  },
+  "dengue": {
+   "hit_rate_%": 100.0,
+   "questions": 8
+  },
+  "diabetes": {
+   "hit_rate_%": 100.0,
+   "questions": 5
+  },
+  "diarrhoea": {
+   "hit_rate_%": 100.0,
+   "questions": 8
+  },
+  "elderly": {
+   "hit_rate_%": 83.3,
+   "questions": 6
+  },
+  "fever": {
+   "hit_rate_%": 100.0,
+   "questions": 5
+  },
+  "general": {
+   "hit_rate_%": 100.0,
+   "questions": 2
+  },
+  "heatstroke": {
+   "hit_rate_%": 100.0,
+   "questions": 6
+  },
+  "hygiene": {
+   "hit_rate_%": 100.0,
+   "questions": 4
+  },
+  "hypertension": {
+   "hit_rate_%": 100.0,
+   "questions": 6
+  },
+  "malaria": {
+   "hit_rate_%": 100.0,
+   "questions": 6
+  },
+  "mental health": {
+   "hit_rate_%": 80.0,
+   "questions": 5
+  },
+  "newborn": {
+   "hit_rate_%": 88.9,
+   "questions": 9
+  },
+  "pregnancy": {
+   "hit_rate_%": 87.5,
+   "questions": 8
+  },
+  "rabies": {
+   "hit_rate_%": 100.0,
+   "questions": 6
+  }
+ },
+ "failures": [
+  {
+   "type": "normal",
+   "question": "బొడ్డు తాడును ఎలా శుభ్రంగా ఉంచాలి?",
+   "why": "hit=False, status=idk"
+  },
+  {
+   "type": "normal",
+   "question": "What are the warning signs in pregnancy?",
+   "why": "hit=False, status=ok"
+  },
+  {
+   "type": "normal",
+   "question": "వడదెబ్బ అంటే ఏమిటి?",
+   "why": "hit=True, status=idk"
+  },
+  {
+   "type": "normal",
+   "question": "What exercise is good for old people?",
+   "why": "hit=False, status=ok"
+  },
+  {
+   "type": "normal",
+   "question": "నాకు చాలా ఒత్తిడిగా ఉంది ఎవరితో మాట్లాడాలి?",
+   "why": "hit=False, status=ok"
+  },
+  {
+   "type": "out_of_scope",
+   "question": "Which crop is best for black soil?",
+   "why": "status=ok"
+  }
+ ]
+}

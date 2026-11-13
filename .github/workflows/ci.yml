@@ -1,0 +1,19 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install (light packages only; voice/ML tests skip themselves)
+        run: pip install -r requirements.txt httpx
+      - name: Unit tests + safety checks over the question bank
+        run: python -m unittest discover -s tests -t . -v

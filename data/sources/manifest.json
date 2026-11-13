@@ -1,0 +1,74 @@
+{
+ "asha_induction.pdf": {
+  "url": "https://nhm.gov.in/images/pdf/communitisation/asha/ASHA_Induction_Module_English.pdf",
+  "bytes": 2093967,
+  "sha256": "563ddb0a4f23c16bed186e14c88d6c60e3f33fadcf7d4810175da41f391a794f",
+  "checked": "2026-11-13"
+ },
+ "asha_module7.pdf": {
+  "url": "https://nhsrcindia.org/sites/default/files/2021-06/Skills%20That%20Save%20Lives%20ASHA%20Module-7%20English.pdf",
+  "bytes": 4549790,
+  "sha256": "e80dc742dee8f7c94ff07cf1cff4b4bda8e040d8f27f5da6a8333af7e8e9ecea",
+  "checked": "2026-11-13"
+ },
+ "asha_ncd.pdf": {
+  "url": "https://aam.mohfw.gov.in/download/document/263f3ca26df87dc44b7687c1b9cf0c15.pdf",
+  "bytes": 4095317,
+  "sha256": "660a636c80d94e2decbbf399e630a4335a754d791de1cc91e29cb3f7dc021e46",
+  "checked": "2026-11-13"
+ },
+ "hypertension_stg.pdf": {
+  "url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/6591.pdf",
+  "bytes": 1748005,
+  "sha256": "62de7ccc3b98e5e8b368cdab9abcf3e89cf6f1fe4e8173be6b594d448145cb1b",
+  "checked": "2026-11-13"
+ },
+ "dengue_2023.pdf": {
+  "url": "https://ncvbdc.mohfw.gov.in/Doc/National%20Guidelines%20for%20Clinical%20Management%20of%20Dengue%20Fever%202023.pdf",
+  "bytes": 4917466,
+  "sha256": "7c8ffbadaee6ebdb31c677e27c553915ea027aa168d0ca6ede890c44bbcb4407",
+  "checked": "2026-11-13"
+ },
+ "malaria_asha_2025.pdf": {
+  "url": "https://ncvbdc.mohfw.gov.in/Doc/Malaria-Training-Module-ASHA-2025.pdf",
+  "bytes": 4261178,
+  "sha256": "d30de7ca631f63240520f7daf3d8df5d32192fb47abeaede7391c1fdfd8b8576",
+  "checked": "2026-11-13"
+ },
+ "heat_cooling.pdf": {
+  "url": "https://heathealth.info/wp-content/uploads/Emergency-Cooling-for-Severe-Heat-Related-Illnesses_March2024_NPCCHH.pdf",
+  "bytes": 1921479,
+  "sha256": "565ac2b026b7e6b9055b8fe48230c9d4dc66186eebf088e8eeff0fc1fbbc51fb",
+  "checked": "2026-11-13"
+ },
+ "snakebite_stg.pdf": {
+  "url": "https://ncdc.mohfw.gov.in/uploads/pdf/Standard-Treatment-Guidelines-for-Management-of-Snake-Bite.pdf",
+  "bytes": 5316838,
+  "sha256": "3c42a1b83775bd03a288bb3d43f8927fafce8c1cc3e4a59a4e9b380ce97898c3",
+  "checked": "2026-11-13"
+ },
+ "elderly_asha.pdf": {
+  "url": "https://nhsrcindia.org/sites/default/files/2021-11/Elderly%20Care%20Training%20Manual%20for%20ASHA.pdf",
+  "bytes": 4358824,
+  "sha256": "c3338dbf0d8c2c9f4d7713f8d51d44c62df2b9085800798591d473b004ac4e8a",
+  "checked": "2026-11-13"
+ },
+ "mental_health_day.pdf": {
+  "url": "https://nhm.gov.in/pdf/2024/World_Mental_Health_Day.pdf",
+  "bytes": 1242270,
+  "sha256": "2c20b5f4752a8aa9cd54f1564270a7de753622e3e51da54354836474a33ef6c5",
+  "checked": "2026-11-13"
+ },
+ "telemanas_overview.pdf": {
+  "url": "https://mail.lgbrimh.gov.in/resources/TeleMANAS/Tele-MANAS_Overview.pdf",
+  "bytes": 161513,
+  "sha256": "e396fa1733b25c60e37a5bc6b700577002e30e1795eeda35a64df08e456f29de",
+  "checked": "2026-11-13"
+ },
+ "rabies_guidelines.pdf": {
+  "url": "https://rabiesfreeindia.mohfw.gov.in/resources/uploads/PageContentPdf/170687215557.pdf",
+  "bytes": 555408,
+  "sha256": "a0267f59e5c2700ce9af3496b340261ce64f07ef9d685737a0021b9ac9bbbc26",
+  "checked": "2026-11-13"
+ }
+}
