@@ -4,7 +4,7 @@ This file is a **step-by-step setup script written in plain English**.
 It is meant to be read and followed by an AI coding assistant (or a person) on a fresh machine.
 Follow the steps **in order**. After each step, run its **Check** and do not continue until it passes.
 
-Last verified: 2026-11-13 on macOS 27 (Apple Silicon), Python 3.12.13. 55 tests passing.
+Last verified: 2026-11-13 on macOS 27 (Apple Silicon), Python 3.12.13. 61 tests passing.
 
 ---
 
@@ -158,7 +158,7 @@ Then cut them into searchable passages:
 ```bash
 python -m src.ingest
 ```
-Expected last line: `Total: 1885 chunks from 12 files -> .../data/chunks.json` (the number can differ slightly if a website updated a PDF).
+Expected last line: `Total: 1855 chunks from 12 files -> .../data/chunks.json` (the number can differ slightly if a website updated a PDF).
 
 **Check:** compare the downloaded files with the tested versions:
 ```bash
@@ -210,7 +210,7 @@ Models are saved in `~/.cache/huggingface/` (set `HF_HOME` to move them).
 python -m unittest discover -s tests -t . -v
 ```
 
-**Check:** the last lines say `Ran 55 tests` and `OK` (the count grows as tests are added; it must say `OK`).
+**Check:** the last lines say `Ran 61 tests` and `OK` (the count grows as tests are added; it must say `OK`).
 
 ---
 
@@ -227,7 +227,7 @@ Takes about 3–5 minutes. It writes `eval/results.md` and `eval/results.json`.
 |---|---|
 | emergency_recall_% | **100.0** (must be 100) |
 | dose_refusal_rate_% | **100.0** (must be 100) |
-| retrieval_hit_rate_top3_% | about 95.7 |
+| retrieval_hit_rate_top3_% | about 97.8 |
 | correct_idk_rate_% | about 95.8 |
 
 If emergency or dose numbers are below 100, **stop and tell the user**. That is a safety problem.

@@ -9,6 +9,7 @@ import csv
 import json
 import logging
 import re
+import unicodedata
 from pathlib import Path
 
 from pypdf import PdfReader
@@ -32,11 +33,25 @@ def load_friendly_names(csv_path=config.SOURCES_CSV):
     return names
 
 
+# Bump this when clean_text changes, so cached chunks are rebuilt.
+CLEAN_VERSION = 2
+
+# PDF list bullets: real ones (• ● ▪ ➢ ...) and symbol-font ones in the private-use area
+# (U+F06C, U+F0B7 ...), which show as boxes on screen and get read aloud by speech.
+BULLETS = re.compile(r"\s*[•‣⁃∙■-◿➢➤-]+\s*")
+
+
 def clean_text(text):
-    """Fix common PDF mess: broken words at line ends, many spaces, new lines."""
+    """Fix common PDF mess: ligatures, bullets, dot leaders, broken words, extra spaces."""
+    text = unicodedata.normalize("NFKC", text)  # "ﬁ" -> "fi", so "ﬁrst" matches "first"
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", "", text)  # control characters
     text = re.sub(r"-\s*\n\s*", "", text)      # "treat-\nment" -> "treatment"
+    text = BULLETS.sub(". ", text)             # each bullet point becomes its own sentence
+    text = re.sub(r"(?:\.\s*){3,}|…+", " ", text)  # table-of-contents dot leaders
     text = re.sub(r"\s+", " ", text)           # many spaces/new lines -> one space
-    return text.strip()
+    text = re.sub(r"(?:\s*\.\s*){2,}", ". ", text)  # ". . " left by bullets after a full stop
+    text = re.sub(r"([:;,])\s*\.\s", r"\1 ", text)  # "signs: . fever" -> "signs: fever"
+    return text.strip(" .")
 
 
 def read_pages(path):
@@ -92,7 +107,7 @@ def ingest(sources_dir=config.SOURCES_DIR, csv_path=config.SOURCES_CSV,
     chunks = []
     for path in files:
         source_name = names.get(path.name, path.stem)
-        stamp = f"{path.stat().st_size}-{int(path.stat().st_mtime)}-{source_name}"
+        stamp = f"{path.stat().st_size}-{int(path.stat().st_mtime)}-{source_name}-v{CLEAN_VERSION}"
         cache_file = cache_dir / (path.name + ".json")
         cached = None
         if cache_file.exists():

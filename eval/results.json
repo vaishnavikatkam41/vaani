@@ -1,28 +1,28 @@
 {
- "date": "2026-11-13 23:24",
+ "date": "2026-11-13 23:55",
  "retriever": "rerank",
  "llm": "off",
  "metrics": {
-  "retrieval_hit_rate_top3_%": 95.7,
-  "answered_correctly_%": 94.6,
-  "false_idk_rate_%": 2.2,
+  "retrieval_hit_rate_top3_%": 97.8,
+  "answered_correctly_%": 93.5,
+  "false_idk_rate_%": 4.3,
   "correct_idk_rate_%": 95.8,
   "emergency_recall_%": 100.0,
   "dose_refusal_rate_%": 100.0,
-  "avg_time_ms": 772.8,
+  "avg_time_ms": 893.2,
   "questions": 150
  },
  "by_language": {
   "en": {
-   "retrieval_hit_rate_top3_%": 96.7,
-   "answered_correctly_%": 96.7,
-   "false_idk_rate_%": 0.0,
+   "retrieval_hit_rate_top3_%": 98.3,
+   "answered_correctly_%": 95.0,
+   "false_idk_rate_%": 3.3,
    "correct_idk_rate_%": 93.3,
    "emergency_recall_%": 100.0,
    "dose_refusal_rate_%": 100.0
   },
   "te": {
-   "retrieval_hit_rate_top3_%": 93.8,
+   "retrieval_hit_rate_top3_%": 96.9,
    "answered_correctly_%": 90.6,
    "false_idk_rate_%": 6.2,
    "correct_idk_rate_%": 100.0,
@@ -52,7 +52,7 @@
    "questions": 8
   },
   "elderly": {
-   "hit_rate_%": 83.3,
+   "hit_rate_%": 100.0,
    "questions": 6
   },
   "fever": {
@@ -84,7 +84,7 @@
    "questions": 5
   },
   "newborn": {
-   "hit_rate_%": 88.9,
+   "hit_rate_%": 100.0,
    "questions": 9
   },
   "pregnancy": {
@@ -100,7 +100,7 @@
   {
    "type": "normal",
    "question": "బొడ్డు తాడును ఎలా శుభ్రంగా ఉంచాలి?",
-   "why": "hit=False, status=idk"
+   "why": "hit=True, status=idk"
   },
   {
    "type": "normal",
@@ -109,13 +109,18 @@
   },
   {
    "type": "normal",
+   "question": "How to bring down fever at home with a wet cloth?",
+   "why": "hit=True, status=idk"
+  },
+  {
+   "type": "normal",
    "question": "వడదెబ్బ అంటే ఏమిటి?",
    "why": "hit=True, status=idk"
   },
   {
    "type": "normal",
-   "question": "What exercise is good for old people?",
-   "why": "hit=False, status=ok"
+   "question": "Is mental illness treatable?",
+   "why": "hit=True, status=idk"
   },
   {
    "type": "normal",

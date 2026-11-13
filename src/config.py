@@ -28,10 +28,10 @@ DEFAULT_RETRIEVER = os.getenv("VAANI_RETRIEVER", "rerank")
 THRESHOLDS = {
     "tfidf": (0.12, 0.25),
     "embedding": (0.79, 0.82),   # dev-tuned 0.789; only 84.2% right on the test split - off-topic leaks through
-    # Reranker scores are 0..1 probabilities. Cut-off 0.086 chosen on the dev split by
+    # Reranker scores are 0..1 probabilities. Cut-off 0.091 chosen on the dev split by
     # tools/tune_thresholds.py -> 98.2% right on the unseen test split (2026-11-13).
     # 0.5 = the reranker thinks it is more likely than not that the passage answers.
-    "rerank": (0.086, 0.5),
+    "rerank": (0.091, 0.5),
 }
 
 # Conversation memory (kept only in RAM, never saved to disk)

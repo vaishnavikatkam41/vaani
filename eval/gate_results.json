@@ -1,10 +1,10 @@
 {
  "embedding": {
-  "cutoff": 0.7887,
+  "cutoff": 0.7901,
   "date": "2026-11-13",
   "dev_accuracy_%": 84.7,
-  "test_accuracy_%": 84.2,
-  "test_offtopic_answered": 8,
+  "test_accuracy_%": 86.0,
+  "test_offtopic_answered": 7,
   "test_offtopic_total": 11,
   "test_mistakes": [
    "said IDK to a real question: కుక్క కాటు గాయాన్ని ఎలా కడగాలి?",
@@ -14,14 +14,13 @@
    "answered off-topic: How do I kill pests on my cotton crop?",
    "answered off-topic: How do I learn English quickly?",
    "answered off-topic: రేపు వర్షం పడుతుందా?",
-   "answered off-topic: రేషన్ కార్డు ఎలా తీసుకోవాలి?",
-   "answered off-topic: బిర్యానీ ఎలా వండాలి?"
+   "answered off-topic: రేషన్ కార్డు ఎలా తీసుకోవాలి?"
   ]
  },
  "rerank": {
-  "cutoff": 0.0862,
+  "cutoff": 0.0908,
   "date": "2026-11-13",
-  "dev_accuracy_%": 96.6,
+  "dev_accuracy_%": 93.2,
   "test_accuracy_%": 98.2,
   "test_offtopic_answered": 0,
   "test_offtopic_total": 11,

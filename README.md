@@ -34,7 +34,8 @@ Health apps need text. Phones can listen. Vaani is built for them:
 | Listen again / slower playback | Done |
 | Thumbs up/down feedback, unanswered-question log (SQLite) | Done |
 | Night mode, installable web app (PWA), low-vision friendly sizes | Done |
-| 55 automated tests + GitHub CI | Done |
+| "Warm & folk" design: kolam mic, 9 illustrated topic pictures, oil-lamp trust meter | Done |
+| 61 automated tests + GitHub CI | Done |
 
 See the [Roadmap](#11-roadmap) for what is planned.
 
@@ -95,7 +96,7 @@ These rules are enforced in code and covered by tests (`tests/test_safety.py`, `
 - **Deep Learning:** multilingual-e5-small embeddings (Telugu question to English passage), Whisper (faster-whisper) ASR fallback, Sarvam AI speech and language models.
 - **Data Science:** PDF cleaning and chunking, vector search with FAISS, threshold tuning with probe questions, evaluation set with hit-rate metrics, k-means topic clustering (planned for the ASHA dashboard).
 - **Backend:** Python, FastAPI, SQLite.
-- **Frontend:** plain HTML, CSS and JavaScript (installable PWA). No framework. Hind Guntur font, "Pasupu" turmeric design.
+- **Frontend:** plain HTML, CSS and JavaScript (installable PWA). No framework. Hind Guntur + Ramabhadra fonts, "warm & folk" design (kolam, earthy indigo / terracotta / turmeric, red only for emergencies).
 - **Voice:** Sarvam speech-to-text (`te-IN`), gTTS for speech out.
 
 ## 6. Run it on your laptop
@@ -140,13 +141,13 @@ python -m src.cli             # try it in the terminal
 PDFs are not stored in this repository. Their official links are in `data/sources.csv`, and
 `data/sources/manifest.json` records the size and SHA-256 of each file Vaani was tested with.
 
-## 7. Results (150 questions, 2026-11-13)
+## 7. Results (150 questions, 2026-11-14)
 
 | Measure | All | English | Telugu |
 |---|---|---|---|
 | Emergencies caught | **100%** | 100% | 100% |
 | Dose questions refused | **100%** | 100% | 100% |
-| Right passage in top 3 | **95.7%** | 96.7% | 93.8% |
+| Right passage in top 3 | **97.8%** | 98.3% | 96.9% |
 | Off-topic correctly refused ("I don't know") | **95.8%** | 93.3% | 100% |
 
 **What changed the numbers.** With embeddings alone, off-topic questions ("How do I learn English?", 0.84)
@@ -158,7 +159,7 @@ of the questions and measured on the unseen test half:
 
 | Search | Right decision on unseen questions | Off-topic wrongly answered |
 |---|---|---|
-| Embeddings only | 84.2% | 8 of 11 |
+| Embeddings only | 86.0% | 8 of 11 |
 | Translate + rerank | **98.2%** | **0 of 11** |
 
 Live page: `/metrics.html`. Full table: `eval/results.md`. Label corrections are logged in `eval/LABEL_CHANGES.md`.
@@ -166,7 +167,7 @@ Live page: `/metrics.html`. Full table: `eval/results.md`. Label corrections are
 ## 8. Test and measure
 
 ```powershell
-python -m unittest discover -s tests -t . -v      # 55 tests (also run by GitHub CI on every push)
+python -m unittest discover -s tests -t . -v      # 61 tests (also run by GitHub CI on every push)
 python -m eval.run_eval                           # 150 questions -> eval/results.md + results.json
 python -m tools.tune_thresholds --retriever rerank  # pick the "I don't know" cut-off on dev, report on test
 ```

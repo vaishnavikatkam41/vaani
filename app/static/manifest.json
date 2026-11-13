@@ -4,8 +4,8 @@
   "description": "Telugu voice health assistant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F5B820",
-  "theme_color": "#F5B820",
+  "background_color": "#F7EEDC",
+  "theme_color": "#2B3A67",
   "lang": "te",
   "icons": [
     {

@@ -20,15 +20,28 @@ def keywords(text):
     return {w for w in re.findall(r"[a-zA-Z]{3,}", text.lower()) if w not in STOPWORDS}
 
 
+def _whole_sentences(text, max_words):
+    """Sentences of a passage, without the half-sentence a chunk often starts with
+    (chunks are cut by word count, so the first piece may begin mid-sentence)."""
+    out = []
+    for i, sentence in enumerate(split_sentences(text)):
+        if i == 0 and sentence[:1].islower():
+            continue
+        if 4 <= len(sentence.split()) <= max_words:
+            out.append(sentence)
+    return out
+
+
 def pick_sentences(question, hits, max_sentences=3, max_words=45):
-    """Choose up to `max_sentences` sentences that share the most words with the question."""
+    """Choose up to `max_sentences` sentences that share the most words with the question.
+    For a Telugu question we match on the English search text the retriever made."""
     q_words = keywords(question)
+    if not q_words and hits and hits[0].get("search_text"):
+        q_words = keywords(hits[0]["search_text"])
     candidates = []  # (score, order, sentence)
     order = 0
     for hit in hits[:2]:
-        for sentence in split_sentences(hit["text"]):
-            if not 4 <= len(sentence.split()) <= max_words:
-                continue
+        for sentence in _whole_sentences(hit["text"], max_words):
             overlap = len(q_words & keywords(sentence))
             if overlap:
                 candidates.append((overlap, order, sentence))
@@ -36,7 +49,8 @@ def pick_sentences(question, hits, max_sentences=3, max_words=45):
     if not candidates and hits:
         # No shared words (a Telugu question has no English words to match).
         # Retrieval already found the best passage by MEANING, so use its first sentences.
-        first = [x for x in split_sentences(hits[0]["text"]) if 4 <= len(x.split()) <= max_words]
+        first = _whole_sentences(hits[0]["text"], max_words) or [
+            x for x in split_sentences(hits[0]["text"]) if 4 <= len(x.split()) <= max_words]
         return " ".join(first[:max_sentences])
     best = sorted(candidates, key=lambda c: (-c[0], c[1]))[:max_sentences]
     return " ".join(s for _, _, s in sorted(best, key=lambda c: c[1]))
